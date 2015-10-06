@@ -117,13 +117,25 @@ let LineChart = React.createClass({
             let valueLeft = x(values(stack)[indexLeft]);
 
             let index;
-            if (Math.abs(xValueCursor - valueRight) < Math.abs(xValueCursor - valueLeft)) {
-                index = indexRight;
+            if (this.props.tooltipInterpolator) {
+              return {
+                label: label(stack),
+                value: this.props.tooltipInterpolator(
+                  xValueCursor,
+                  {x: valueLeft, y: y(values(stack)[indexLeft])},
+                  {x: valueRight, y: y(values(stack)[indexRight])}
+                )
+              };
             } else {
-                index = indexLeft;
+              if (Math.abs(xValueCursor - valueRight) < Math.abs(xValueCursor - valueLeft)) {
+                  index = indexRight;
+                  otherIndex = indexLeft;
+              } else {
+                  index = indexLeft;
+                  otherIndex = indexRight;
+              }
+              return { label: label(stack), value: values(stack)[index] };
             }
-
-            return { label: label(stack), value: values(stack)[index] };
         });
 
         valuesAtX.sort((a, b) => { return y(a.value) - y(b.value); });
